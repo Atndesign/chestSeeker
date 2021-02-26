@@ -4037,7 +4037,8 @@ ct.rooms.beforeDraw = function beforeDraw() {
     
 };
 ct.rooms.afterDraw = function afterDraw() {
-    ct.mouse.xprev = ct.mouse.x;
+    ct.keyboard.clear();
+ct.mouse.xprev = ct.mouse.x;
 ct.mouse.yprev = ct.mouse.y;
 ct.mouse.xuiprev = ct.mouse.xui;
 ct.mouse.yuiprev = ct.mouse.yui;
@@ -4052,7 +4053,6 @@ if (ct.sound.follow && !ct.sound.follow.kill) {
 } else if (ct.sound.manageListenerPosition) {
     ct.sound.howler.pos(ct.camera.x, ct.camera.y, ct.camera.z || 0);
 }
-ct.keyboard.clear();
 
 };
 
@@ -4068,7 +4068,7 @@ ct.rooms.templates['Room_3c28ba730325'] = {
     backgroundColor: '#000000',
     onStep() {
         if(ct.room.chest === ct.room.chestTotal){
-    ct.transition.circleOut(1000, 0x446ADB).then(() => {
+    ct.transition.circleOut(1000, 0x000000).then(() => {
             ct.rooms.switch('Room_3c28ba730325')
     }
     )
@@ -4081,8 +4081,13 @@ ct.rooms.templates['Room_3c28ba730325'] = {
         
     },
     onCreate() {
-        
-ct.transition.circleIn(1000, 0x446ADB)
+        if(ct.sound.playing('ambiance2')){
+
+}
+else{
+    ct.sound.spawn('ambiance2')
+}
+ct.transition.circleIn(1000, 0x000000)
 const tilemap = ct.tilemaps.create(-100);
 ct.noise.setSeed(); // Randomize the seed on each start
 
@@ -4090,7 +4095,8 @@ ct.noise.setSeed(); // Randomize the seed on each start
 for (var x = 0; x < ct.camera.width / 64; x++) {
     for (var y = 0; y < ct.camera.height / 64; y++) {
         var value = ct.noise.simplex2d(x / 7, y / 7); // Returns a value from -1 to 1.
-        if (value < - 0.5) {
+         
+        if (value <= 0.1) {
             tilemap.addTile('floor_1', x*64, y*64);
             // Tiles are PIXI.Sprites; we can tweak their color and opacity before caching
             }
@@ -4125,7 +4131,12 @@ for(let i = 0; i < randomNbrOfChest; i++){
 }
 
 inGameRoomStart(this);
+
+ct.sound.volume('ambiance2', 0.7)
+ct.sound.volume("chestPicked", 0.6)
 // ct.types.copy('chest', 0, 0)
+
+
     },
     extends: {}
 }
@@ -4567,7 +4578,7 @@ class EmitterTandem extends PIXI.Container {
      */
     ct.res = {
         soundsLoaded: 0,
-        soundsTotal: [0][0],
+        soundsTotal: [3][0],
         soundsError: 0,
         sounds: {},
         registry: [{"player_idle":{"frames":6,"shape":{"type":"rect","top":32,"bottom":32,"left":32,"right":32},"anchor":{"x":0.5,"y":0.5}},"floor_1":{"frames":1,"shape":{"type":"rect","top":0,"bottom":16,"left":0,"right":16},"anchor":{"x":0,"y":0}},"floor_3":{"frames":1,"shape":{"type":"rect","top":0,"bottom":64,"left":0,"right":64},"anchor":{"x":0,"y":0}},"floor_5":{"frames":1,"shape":{"type":"rect","top":0,"bottom":64,"left":0,"right":64},"anchor":{"x":0,"y":0}},"VuIwljr_4x":{"frames":1,"shape":{"type":"rect","top":0,"bottom":64,"left":0,"right":64},"anchor":{"x":0,"y":0}},"floor_6":{"frames":1,"shape":{"type":"rect","top":0,"bottom":80,"left":0,"right":80},"anchor":{"x":0,"y":0}},"floor_2":{"frames":1,"shape":{"type":"rect","top":0,"bottom":64,"left":0,"right":64},"anchor":{"x":0,"y":0}},"floor_4":{"frames":1,"shape":{"type":"rect","top":0,"bottom":64,"left":0,"right":64},"anchor":{"x":0,"y":0}},"player_run":{"frames":6,"shape":{"type":"rect","top":32,"bottom":32,"left":32,"right":32},"anchor":{"x":0.5,"y":0.5}},"Placeholder":{"frames":3,"shape":{"type":"rect","top":0,"bottom":128,"left":0,"right":384},"anchor":{"x":0,"y":0}},"New_Piskel":{"frames":12,"shape":{"type":"rect","top":64,"bottom":0,"left":32,"right":32},"anchor":{"x":0.5,"y":1}}}][0],
@@ -5125,6 +5136,7 @@ const obstacle = ct.place.occupied(this, 'Solid');
 if (ct.types.isCopy(obstacle)) {
     ct.room.chest += 1
     obstacle.kill = true;
+    ct.sound.spawn('chestPicked')
 } else {
     this.move();
 }
@@ -6362,6 +6374,30 @@ if (!ct.sound) {
 }
 
 
+ct.sound.init('chestPicked', {
+    wav: './snd/a2b38ece-ff1c-4e7c-8926-99b60da7e8cb.wav',
+    mp3: false,
+    ogg: false
+}, {
+    poolSize: 5,
+    music: false
+});
+ct.sound.init('ambiance', {
+    wav: './snd/0af868e6-c77b-49c5-b760-5e1551709052.wav',
+    mp3: false,
+    ogg: false
+}, {
+    poolSize: 5,
+    music: false
+});
+ct.sound.init('ambiance2', {
+    wav: './snd/acba96ce-029e-4eee-b3a8-2e137a8d78f2.wav',
+    mp3: false,
+    ogg: false
+}, {
+    poolSize: 5,
+    music: false
+});
 (function timerAddon() {
     const ctTimerTime = Symbol('time');
     const ctTimerRoomUid = Symbol('roomUid');
